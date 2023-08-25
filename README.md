@@ -4,45 +4,39 @@ If our `JSON` string is very large, but we want to keep only a part of the field
 
 This little plugin is used to achieve this goal
 
+
+## Usage
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/penglongli/jsonfield"
+)
+
+func main() {
+	// the original json string (so long)
+	var str = `{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"name":"nginx-deployment","labels":{"app":"nginx"}},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"nginx"}},"template":{"metadata":{"labels":{"app":"nginx"}},"spec":{"containers":[{"name":"nginx","image":"nginx:1.14.2","ports":[{"containerPort":80}]}]}}}}`
+	// the target path need to reserved
+	reservePath := []string{"kind", "metadata.name", "spec.replicas", "spec.template.spec.containers.image"}
+	
+	// use jsonfiled to reserve target paths
+	bs, err := jsonfield.ReserveField([]byte(str), reservePath)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(bs))
+}
+```
+
 ## Purpose
 
 There is a json string as example:
 
 ```json
-{
-  "apiVersion": "apps/v1",
-  "kind": "Deployment",
-  "metadata": {
-    "name": "nginx-deployment",
-    "labels": {
-      "app": "nginx"
-    }
-  },
-  "spec": {
-    "replicas": 3,
-    "selector": {
-      "matchLabels": {
-        "app": "nginx"
-      }
-    },
-    "template": {
-      "metadata": {
-        "labels": {
-          "app": "nginx"
-        }
-      },
-      "spec": {
-        "containers": [{
-          "name": "nginx",
-          "image": "nginx:1.14.2",
-          "ports": [{
-            "containerPort": 80
-          }]
-        }]
-      }
-    }
-  }
-}
+{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"name":"nginx-deployment","labels":{"app":"nginx"}},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"nginx"}},"template":{"metadata":{"labels":{"app":"nginx"}},"spec":{"containers":[{"name":"nginx","image":"nginx:1.14.2","ports":[{"containerPort":80}]}]}}}}
 ```
 
 It's so long, and we only want some target field:
@@ -63,29 +57,6 @@ It's so long, and we only want some target field:
 			}
 		}
 	}
-}
-```
-
-## Usage
-
-```go
-package main
-
-import (
-	"fmt"
-
-	"github.com/penglongli/jsonfield"
-)
-
-func main() {
-	var str = `{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"name":"nginx-deployment","labels":{"app":"nginx"}},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"nginx"}},"template":{"metadata":{"labels":{"app":"nginx"}},"spec":{"containers":[{"name":"nginx","image":"nginx:1.14.2","ports":[{"containerPort":80}]}]}}}}`
-	reservePath := []string{"kind", "metadata.name", "spec.replicas", "spec.template.spec.containers.image"}
-	bs, err := jsonfield.ReserveField([]byte(str), reservePath)
-	if err != nil {
-		panic(err)
-	}
-	
-	fmt.Println(string(bs))
 }
 ```
 
